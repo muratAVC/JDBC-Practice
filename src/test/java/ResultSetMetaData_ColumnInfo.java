@@ -7,7 +7,7 @@ public class ResultSetMetaData_ColumnInfo {
 //        Statement statement=null;
 //        ResultSet resultSet=null;
         try(Connection connection= DriverManager.getConnection(url,"hr","hr");
-           Statement statement=connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);
+           Statement statement=connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
            ResultSet resultSet=statement.executeQuery("SELECT * fROM REGIONS");
            ) {
             System.out.println("Connection is successfully");
