@@ -1,6 +1,5 @@
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class DB_Utility {
     static Connection connection;
@@ -8,7 +7,7 @@ public class DB_Utility {
     static Statement statement;
 
     public static void createConnection(){
-        String url="jdbc:oracle:thin:@ 35.175.108.191:1521:XE";
+        String url="jdbc:oracle:thin:@ 44.205.20.223:1521:XE";
        try{connection= DriverManager.getConnection(url,"hr","hr");
             System.out.println("Connection is successfully");
         } catch (SQLException e) {
@@ -88,6 +87,19 @@ public class DB_Utility {
         return result;
     }
 
+    public static List<String> getColumnDataAsList(String columnName){
+        List<String> result =new ArrayList<>();
+        try {
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                result.add(resultSet.getString(columnName));
+            }
+            resultSet.beforeFirst();
+        } catch (SQLException e) {
+            System.out.println("Error whole getting row data"+e.getMessage());
+        }
+        return result;
+    }
     public static List<String> getColumnDataAsList(int columnIndex){
         List<String> result =new ArrayList<>();
         try {
@@ -95,6 +107,7 @@ public class DB_Utility {
             while (resultSet.next()){
                 result.add(resultSet.getString(columnIndex));
             }
+            resultSet.beforeFirst();
         } catch (SQLException e) {
             System.out.println("Error whole getting row data"+e.getMessage());
         }
@@ -107,7 +120,7 @@ public class DB_Utility {
             ResultSetMetaData resultSetMetaData=resultSet.getMetaData();
             resultSet.absolute(rowNum);
             result=resultSet.getString(columnIndex);
-
+            resultSet.beforeFirst();
         } catch (SQLException e) {
             System.out.println("Error getting cell data "+e.getMessage());
         }
@@ -122,8 +135,49 @@ public class DB_Utility {
             resultSet.absolute(rowNum);
             result=resultSet.getString(columnName);
 
+            resultSet.beforeFirst();
         } catch (SQLException e) {
             System.out.println("Error getting cell data "+e.getMessage());
+        }
+
+        return result;
+    }
+
+    public static void displayAllData (){
+        try {
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                for (int i = 1; i <=getColumnCNT() ; i++) {
+                    System.out.print(resultSet.getString(i)+"\t");
+                }
+                System.out.println("");
+
+            }
+
+            resultSet.beforeFirst();
+        } catch (SQLException e) {
+            System.out.println("Error whole displayAllData "+e.getMessage());
+        }
+    }
+
+    public static List<Map<String,String>> getAllDataListOfMap(){
+        List<Map<String,String>> result=new ArrayList<>();
+        for (int i = 1; i <= getRowCount(); i++) {
+                result.add(getRowMap(i));
+        }
+        return result;
+    }
+    public static Map<String,String> getRowMap(int row){
+        Map<String,String> result=new LinkedHashMap<>();
+        try {
+            resultSet.absolute(row);
+            ResultSetMetaData resultSetMetaData=resultSet.getMetaData();
+            for (int i = 1; i <= getColumnCNT(); i++) {
+                result.put(resultSetMetaData.getColumnLabel(i),resultSet.getString(i));
+            }
+            resultSet.beforeFirst();
+        } catch (SQLException e) {
+            System.out.println("Error getRowMap "+e.getMessage());
         }
 
         return result;
@@ -132,16 +186,22 @@ public class DB_Utility {
     public static void main(String[] args) throws SQLException {
         createConnection();
         ResultSet rslst = runQuery("Select * From EMPLOYEES");
-        rslst.next();
+//        rslst.next();
 //        System.out.println(rslst.getString("FIRST_NAME"));
 //        System.out.println(getRowCount());
 //        System.out.println("getColumnCNT() = " + getColumnCNT());
 //        System.out.println(getColumnNames());
-        System.out.println(getRowDataAsList(10));
-        System.out.println(getColumnDataAtRow(10,3));
-        System.out.println(getColumnDataAtRow(10,"FIRST_NAME"));
-        System.out.println(getColumnDataAsList(3)+"-");
+//        System.out.println(getRowDataAsList(10));
+//        System.out.println(getColumnDataAtRow(10,3));
+//        System.out.println(getColumnDataAtRow(10,"FIRST_NAME"));
+//        System.out.println(getColumnDataAsList(3)+"-");
+//        System.out.println(getColumnDataAsList("FIRST_NAME"));
+//        displayAllData();
 
+//        System.out.println(getRowMap(10));
+//        Map<String,String> der= getRowMap(10);
+//        System.out.println(der.get("FIRST_NAME"));
+        System.out.println("getAllDataListOfMap() = " + getAllDataListOfMap());
         destroy();
     }
 }
